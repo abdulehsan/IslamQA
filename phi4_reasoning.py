@@ -1,16 +1,20 @@
 import json
-from groq import Groq
+from openai import OpenAI
 from os import getenv
 from dotenv import load_dotenv
 
+endpoint = "https://models.github.ai/inference"
+model = "microsoft/Phi-4-reasoning"
+
 load_dotenv()
 
-client = Groq(
-    api_key=getenv("groq"),
+client = OpenAI(
+    api_key=getenv("github_phi"),
+    base_url=endpoint,
 )
 
 input_file = 'test.jsonl'
-output_file = 'deepseek_v3_0324.jsonl'
+output_file = 'phi4.jsonl'
 
 results = []
 
@@ -25,7 +29,7 @@ with open(input_file, 'r', encoding='utf-8') as file:
                 continue
 
             response = client.chat.completions.create(
-                model="deepseek-r1-distill-llama-70b",
+                model = model,
                 messages=[
                     {"role": "user", "content": question}
                 ],
