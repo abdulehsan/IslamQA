@@ -1,0 +1,6 @@
+langchain
+langchain-openai
+dotenv
+openai
+groq
+google-generative-ai
