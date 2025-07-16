@@ -1,27 +1,26 @@
-import google.generativeai as genai
 import json
+from openai import OpenAI
 from os import getenv
 from dotenv import load_dotenv
+
+endpoint = "https://models.github.ai/inference"
+model = "openai/gpt-4.1"
+
 load_dotenv()
-genai.configure(api_key=getenv("gemini_api"))
 
-model = genai.GenerativeModel("gemini-2.5-flash")
-
-# question = "What is todays date in pakistan?"
-# response = model.generate_content(question)
-# generated_answer = response.text.strip()
-
-# print(f"Generated Answer: {generated_answer}" )
-# # Input/output files
+client = OpenAI(
+    api_key=getenv("github_gpt_4.1"),
+    base_url=endpoint,
+)
 
 input_file = 'test.jsonl'
-output_file = 'gemini.jsonl'
+output_file = 'gpt_4.1.jsonl'
 
 results = []
 
 with open(input_file, 'r', encoding='utf-8') as file:
     for idx, line in enumerate(file):
-        if idx >= 100:
+        if idx >= 49:
             break
         try:
             data = json.loads(line)
@@ -29,8 +28,17 @@ with open(input_file, 'r', encoding='utf-8') as file:
             if not question:
                 continue
 
-            response = model.generate_content(question)
-            generated_answer = response.text.strip()
+            response = client.chat.completions.create(
+                model = model,
+                messages=[
+                    {"role": "user", "content": question}
+                ],
+                temperature=0.7,
+                 max_completion_tokens=512,
+                stream=False
+            )
+
+            generated_answer = response.choices[0].message.content.strip()
 
             output_record = {
                 "Question": data.get("Question") or data.get("question"),
@@ -51,4 +59,3 @@ with open(output_file, 'w', encoding='utf-8') as out_file:
         out_file.write(json.dumps(item, ensure_ascii=False) + '\n')
 
 print(f"\nDone! Generated answers saved to {output_file}")
-

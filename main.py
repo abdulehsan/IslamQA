@@ -2,7 +2,6 @@ import json
 from langchain_openai import ChatOpenAI
 from os import getenv
 
-# Initialize LLM
 op_api_key = getenv("openrouter")
 if not op_api_key:
     raise ValueError("OPENROUTER API key missing.")
@@ -14,7 +13,6 @@ llm = ChatOpenAI(
     temperature=0.7
 )
 
-# Load questions and process
 input_file = 'test.jsonl'
 output_file = 'deepseek-r1t2-chimera.jsonl'
 results = []
@@ -29,10 +27,8 @@ with open(input_file, 'r', encoding='utf-8') as file:
             if not question:
                 continue
 
-            # Directly call the model
             response = llm.invoke(question).content.strip()
 
-            # Store result
             output_record = {
                 "Question": data.get("Question") or data.get("question"),
                 "Answer": data.get("Answer") or data.get("answer"),
@@ -47,7 +43,6 @@ with open(input_file, 'r', encoding='utf-8') as file:
             print(f"Skipping record {idx+1}: {e}")
             continue
 
-# Save results
 with open(output_file, 'w', encoding='utf-8') as out_file:
     for item in results:
         out_file.write(json.dumps(item, ensure_ascii=False) + '\n')

@@ -1,16 +1,13 @@
 import json
-from openai import OpenAI
+from groq import Groq
 from os import getenv
 from dotenv import load_dotenv
 
-
 load_dotenv()
-# Setup DeepSeek API client
-client = OpenAI(
-    api_key=getenv("openrouter_v2"),  # Replace with your actual key
-    base_url="https://openrouter.ai/api/v1"
-)
 
+client = Groq(
+    api_key=getenv("groq"),
+)
 
 input_file = 'test.jsonl'
 output_file = 'deepseek_v3_0324.jsonl'
@@ -18,7 +15,6 @@ output_file = 'deepseek_v3_0324.jsonl'
 
 results = []
 
-# Process first 100 questions
 with open(input_file, 'r', encoding='utf-8') as file:
     for idx, line in enumerate(file):
         if idx >= 100:
@@ -29,19 +25,18 @@ with open(input_file, 'r', encoding='utf-8') as file:
             if not question:
                 continue
 
-            # Call DeepSeek API
             response = client.chat.completions.create(
-                model="deepseek/deepseek-chat-v3-0324:free",
+                model="deepseek-r1-distill-llama-70b",
                 messages=[
                     {"role": "user", "content": question}
                 ],
                 temperature=0.7,
+                 max_completion_tokens=512,
                 stream=False
             )
 
             generated_answer = response.choices[0].message.content.strip()
 
-            # Prepare output
             output_record = {
                 "Question": data.get("Question") or data.get("question"),
                 "Answer": data.get("Answer") or data.get("answer"),
@@ -56,7 +51,6 @@ with open(input_file, 'r', encoding='utf-8') as file:
             print(f"Error at record {idx+1}: {type(e).__name__}: {e}")
             continue
 
-# Save results to JSONL
 with open(output_file, 'w', encoding='utf-8') as out_file:
     for item in results:
         out_file.write(json.dumps(item, ensure_ascii=False) + '\n')
