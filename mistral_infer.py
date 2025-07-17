@@ -16,7 +16,7 @@ tokenizer = AutoTokenizer.from_pretrained(API_URL)
 input_file = 'test.jsonl'
 output_file = 'mistral_7b_instruct_v0.1.jsonl'
 
-TEMPERATURE = 0.7
+TEMPERATURE = 0.1
 MAX_NEW_TOKENS = 512
 
 results = []
