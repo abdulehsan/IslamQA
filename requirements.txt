@@ -4,3 +4,4 @@ dotenv
 openai
 groq
 google-generative-ai
+evaluate
