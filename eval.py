@@ -5,7 +5,7 @@ from rouge_score import rouge_scorer
 generated_answers = []
 actual_answers = []
 
-input_file = 'mistral_7b_instruct_v0.1.jsonl'
+input_file = 'phi4.jsonl'
 with open(input_file, 'r', encoding='utf-8') as file:
     for idx, line in enumerate(file):
         data = json.loads(line)
