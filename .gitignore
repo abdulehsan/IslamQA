@@ -3,3 +3,9 @@ venv/
 __pycache__/
 .env
 ~$Evaluations.xlsx
+Merged_DB/
+RAG with Retriever Routing.ipynb
+hug_end.py
+mistral-7b-instruct-v0-1.ipynb
+quran_faiss/
+quran_faiss_index/
