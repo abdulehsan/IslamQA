@@ -21,18 +21,17 @@ def load_jsonl(file_path):
     with open(file_path, "r", encoding="utf-8") as f:
         return [json.loads(line) for line in f]
 
-ground_truth_data = load_jsonl("gemini.jsonl")
-rag_output_data = load_jsonl("rag_mistral_output.jsonl")
+candidate = load_jsonl("mistral_7b_instruct_v0.1.jsonl")
 
 combined_data = []
-for gt, rag in zip(ground_truth_data, rag_output_data):
-    if not gt.get("Answer"):
+for cand in candidate:
+    if not cand.get("Answer"):
         continue
     combined_data.append({
-        "question": gt["Question"],
-        "answer": rag["Answer"],
-        "contexts": rag["Reference"],  # must be a list
-        "ground_truth": gt["Answer"]
+        "question": cand["Question"],
+        "answer": cand["Answer"],
+        "contexts": cand["document"],
+        "ground_truth": cand["Answer"]
     })
 
 df = pd.DataFrame(combined_data)
