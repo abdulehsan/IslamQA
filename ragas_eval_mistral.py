@@ -22,16 +22,17 @@ def load_jsonl(file_path):
         return [json.loads(line) for line in f]
 
 candidate = load_jsonl("mistral_7b_instruct_v0.1.jsonl")
+reference = load_jsonl("test.jsonl")
 
 combined_data = []
-for cand in candidate:
-    if not cand.get("Answer"):
+for ref, cand in zip(reference, candidate):
+    if not ref.get("Answer"):
         continue
     combined_data.append({
-        "question": cand["Question"],
+        "question": ref["Question"],
         "answer": cand["Answer"],
-        "contexts": cand["document"],
-        "ground_truth": cand["Answer"]
+        "contexts": cand["Reference"],
+        "ground_truth": ref["Answer"]
     })
 
 df = pd.DataFrame(combined_data)

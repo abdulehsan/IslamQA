@@ -2,20 +2,24 @@ import json
 import bert_score
 from rouge_score import rouge_scorer
 from typing import List
+from pathlib import Path
 
-def load_answers(file_path: str, answer_key: str) -> List[str]:
-    answers = []
+
+def load_pairs(file_path: str, ref_key: str, gen_key: str) -> (List[str], List[str]):
+    references, candidates = [], []
     with open(file_path, 'r', encoding='utf-8') as f:
         for line in f:
             data = json.loads(line)
-            answer = data.get(answer_key)
-            if answer:
-                answers.append(answer.strip())
-    return answers
+            ref = data.get(ref_key)
+            gen = data.get(gen_key)
+            if ref and gen:
+                references.append(ref.strip())
+                candidates.append(gen.strip())
+    return references, candidates
 
 def evaluate_scores(candidates: List[str], references: List[str], model_name="en"):
     P, R, F1 = bert_score.score(candidates, references, lang=model_name)
-    print(f"--- BERTScore ---")
+    print(f"\n--- BERTScore ---")
     print(f"Precision: {P.mean().item():.4f}")
     print(f"Recall:    {R.mean().item():.4f}")
     print(f"F1 Score:  {F1.mean().item():.4f}")
@@ -29,22 +33,18 @@ def evaluate_scores(candidates: List[str], references: List[str], model_name="en
         rouge2_list.append(scores['rouge2'].fmeasure)
         rougeL_list.append(scores['rougeL'].fmeasure)
 
-    print(f"--- ROUGE Scores ---")
+    print(f"\n--- ROUGE Scores ---")
     print(f"ROUGE-1 F1: {sum(rouge1_list)/len(rouge1_list):.4f}")
     print(f"ROUGE-2 F1: {sum(rouge2_list)/len(rouge2_list):.4f}")
     print(f"ROUGE-L F1: {sum(rougeL_list)/len(rougeL_list):.4f}")
     print()
 
-reference_file = "gemini.jsonl"
-reference_answers = load_answers(reference_file, answer_key="Answer")  # or "Generated_Answer" if that's the key
+# File and key config
+file_path = Path("gemini(rag).jsonl")
+ref_key = "Reference_Answer"
+gen_key = "Generated_Answer"
 
-candidate_files = [
-    "rag_mistral_output.jsonl",
-    ]
-
-for candidate_file in candidate_files:
-    print(f"Evaluating: {candidate_file}")
-    candidate_answers = load_answers(candidate_file, answer_key="Answer")
-    
-    min_len = min(len(candidate_answers), len(reference_answers))
-    evaluate_scores(candidate_answers[:min_len], reference_answers[:min_len])
+# Load and evaluate
+references, candidates = load_pairs(file_path, ref_key, gen_key)
+min_len = min(len(references), len(candidates))
+evaluate_scores(candidates[:min_len], references[:min_len])

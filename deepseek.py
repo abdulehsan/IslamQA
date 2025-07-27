@@ -30,7 +30,7 @@ with open(input_file, 'r', encoding='utf-8') as file:
                     {"role": "user", "content": question}
                 ],
                 temperature=0.7,
-                 max_completion_tokens=512,
+                max_completion_tokens=512,
                 stream=False
             )
 
